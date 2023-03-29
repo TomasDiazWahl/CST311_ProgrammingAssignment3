@@ -13,6 +13,7 @@ class Server:
         # client list will get client socket and client IP address for each client
         self.clients = []
         self.client_id = 0
+        self.client_messages = []
         self.server_socket = None
 
     # this method starts the server and opens a TCP connection
@@ -25,26 +26,32 @@ class Server:
 
         logging.info(f'Server listening on {self.host}:{self.port}')
 
+    # this method spawns a thread to listen to up to n number of clients
     def listen_for_clients(self, max_clients):
         while len(self.clients) < max_clients:
             client_socket, client_address = self.server_socket.accept()
             logging.info(f'Client {client_address} connected')
+            # clients are added to the client list
+            self.clients.append((client_socket, client_address))
+            # todo clients need a unique identifier which we will pass into handle_client
+            # creates concurrent threads spawned for each client
             client_thread = threading.Thread(target=self.handle_client, args=(client_socket, client_address))
             client_thread.start()
 
     def handle_client(self, client_socket, client_address):
         if len(self.clients) == 0:
-            identifier = 'X'
+            identifier_0 = 'X'
             self.client_id = 0
         elif len(self.clients) == 1:
-            identifier = 'Y'
+            identifier_1 = 'Y'
             self.client_id = 1
         else:
             self.client_id += 1
-            identifier = self.client_id
 
-        self.clients.append((client_socket, client_address))
+        identifier = self.client_id
 
+        # receive message from client(s)
+        client_socket.settimeout(1)
         message = client_socket.recv(1024).decode('utf-8')
         logging.info(f'Received message from {identifier}: {message}')
 
