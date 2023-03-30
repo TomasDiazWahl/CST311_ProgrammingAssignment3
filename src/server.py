@@ -93,7 +93,7 @@ class Server:
 
 
 if __name__ == '__main__':
-    server = Server()
+    server = Server('', 12000)
     server.start_server()
     number_of_clients = 2
     # should return boolean to check if everyone connected
