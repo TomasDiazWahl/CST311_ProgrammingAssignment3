@@ -33,7 +33,7 @@ class Server:
     def listen_for_clients(self, max_clients):
         # gather all the clients before spawing threads
         # let all clients create a connection and join the server
-        self.client_socket.settimeout(10)
+        self.server_socket.settimeout(30)
         for i in range(max_clients):
             try:
                 client_socket, client_address = self.server_socket.accept()
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     server.start_server()
     number_of_clients = 2
     # should return boolean to check if everyone connected
-    server.listen_for_clients(server, number_of_clients)
+    server.listen_for_clients(number_of_clients)
     if len(server.clients) != number_of_clients:
         logging.info(f'One or more clients failed to establish connection')
         exit(-1)
