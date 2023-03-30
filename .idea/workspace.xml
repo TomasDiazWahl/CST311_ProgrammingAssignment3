@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="66d529f4-8758-4c6f-85a0-a4dbc89b55c9" name="Changes" comment="commit server 3">
+    <list default="true" id="66d529f4-8758-4c6f-85a0-a4dbc89b55c9" name="Changes" comment="commit server 4">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/server.py" afterDir="false" />
@@ -83,7 +83,14 @@
       <option name="project" value="LOCAL" />
       <updated>1680114705993</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="commit server 4">
+      <created>1680145705929</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1680145705929</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -92,6 +99,7 @@
     <MESSAGE value="commit server" />
     <MESSAGE value="commit server 2" />
     <MESSAGE value="commit server 3" />
-    <option name="LAST_COMMIT_MESSAGE" value="commit server 3" />
+    <MESSAGE value="commit server 4" />
+    <option name="LAST_COMMIT_MESSAGE" value="commit server 4" />
   </component>
 </project>

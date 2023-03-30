@@ -34,6 +34,7 @@ class Server:
         # gather all the clients before spawing threads
         # let all clients create a connection and join the server
         client_counter = -1
+        # client_socket.settimeout(30)
         while len(self.clients) < max_clients:
             client_socket, client_address = self.server_socket.accept()
             logging.info(f'Client {client_address} connected')
@@ -81,7 +82,6 @@ class Server:
             socket.close()
 
     def handle_client(self, client_id):
-        # client_socket.settimeout(1)
         client = self.clients[client_id]
         client_socket = client["socket"]
         client_address = client["address"]
@@ -90,14 +90,6 @@ class Server:
         logging.info(f'Received message from {client_id}: {message}')
         self.clients[client_id]["msg"] = message
         self.clients[client_id]["msg_time"] = time.time()
-
-        # if len(self.clients) == 2:
-        #     response = f"{client_id}: '{message}', "
-        #     other_identifier = 'Y' if identifier == 'X' else 'X'
-        #     other_socket, _ = self.clients[0] if identifier == 'Y' else self.clients[1]
-        #     other_message = other_socket.recv(1024).decode('utf-8')
-        #     response += f"{other_identifier}: '{other_message}'"
-        #     logging.info(f'Sending response to both clients: {response}')
 
 
 if __name__ == '__main__':
