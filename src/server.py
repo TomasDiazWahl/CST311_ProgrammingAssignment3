@@ -1,6 +1,7 @@
 import socket
 import threading
 import logging
+import time
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -12,9 +13,11 @@ class Server:
         self.port = port
         # client list will get client socket and client IP address for each client
         self.clients = []
-        self.client_id = 0
         self.client_messages = []
         self.server_socket = None
+        self.threads = []
+        self.SOCKET_INDEX = 0
+        self.ADDRESS_INDEX = 1
 
     # this method starts the server and opens a TCP connection
     def start_server(self):
@@ -28,46 +31,81 @@ class Server:
 
     # this method spawns a thread to listen to up to n number of clients
     def listen_for_clients(self, max_clients):
+        # gather all the clients before spawing threads
+        # let all clients create a connection and join the server
+        client_counter = -1
         while len(self.clients) < max_clients:
             client_socket, client_address = self.server_socket.accept()
             logging.info(f'Client {client_address} connected')
             # clients are added to the client list
-            self.clients.append((client_socket, client_address))
-            # todo clients need a unique identifier which we will pass into handle_client
+            client_counter += 1
+            # dictionary (similar to hashmap) to hold our client information to pass into each thread
+            # the threads will write to the message field using some wizardry
+            client_entry = {"socket": client_socket,
+                            "address": client_address,
+                            "client_id": client_counter,
+                            "msg": None,
+                            "msg_time": None}
+            # we append the dictionary to the list
+            # now each entry in the list contains a dictionary with all the client info
+            self.clients.append(client_entry)
+
+        # spawn threads to handle all clients
+        for client_counter, client in enumerate(self.clients):
             # creates concurrent threads spawned for each client
-            client_thread = threading.Thread(target=self.handle_client, args=(client_socket, client_address))
+            client_thread = threading.Thread(target=self.handle_client, args=(client_counter))
             client_thread.start()
+            # add the threads to the thread list
+            self.threads.append(client_thread)
 
-    def handle_client(self, client_socket, client_address):
-        if len(self.clients) == 0:
-            identifier_0 = 'X'
-            self.client_id = 0
-        elif len(self.clients) == 1:
-            identifier_1 = 'Y'
-            self.client_id = 1
+        # wait for all clients to finish
+        for thread in self.threads:
+            thread.join()
+
+    def build_response(self):
+        x = self.clients[0]
+        y = self.clients[1]
+
+        if x["msg_time"] < y["msg_time"]:
+            response_msg = "X: " + x["msg"] + "Y: " + y["msg"]
         else:
-            self.client_id += 1
+            response_msg = "Y: " + y["msg"] + "X: " + x["msg"]
 
-        identifier = self.client_id
+        return response_msg
 
-        # receive message from client(s)
-        client_socket.settimeout(1)
+    def respond_to_clients(self):
+        response_msg = self.build_response()
+        for client in self.clients:
+            socket = client["socket"]
+            socket.sendall(response_msg.encode('utf-8'))
+            socket.close()
+
+    def handle_client(self, client_id):
+        # client_socket.settimeout(1)
+        client = self.clients[client_id]
+        client_socket = client["socket"]
+        client_address = client["address"]
+
         message = client_socket.recv(1024).decode('utf-8')
-        logging.info(f'Received message from {identifier}: {message}')
+        logging.info(f'Received message from {client_id}: {message}')
+        self.clients[client_id]["msg"] = message
+        self.clients[client_id]["msg_time"] = time.time()
 
-        if len(self.clients) == 2:
-            response = f"{identifier}: '{message}', "
-            other_identifier = 'Y' if identifier == 'X' else 'X'
-            other_socket, _ = self.clients[0] if identifier == 'Y' else self.clients[1]
-            other_message = other_socket.recv(1024).decode('utf-8')
-            response += f"{other_identifier}: '{other_message}'"
-            logging.info(f'Sending response to both clients: {response}')
-
-            for socket, _ in self.clients:
-                socket.sendall(response.encode('utf-8'))
-                socket.close()
+        # if len(self.clients) == 2:
+        #     response = f"{client_id}: '{message}', "
+        #     other_identifier = 'Y' if identifier == 'X' else 'X'
+        #     other_socket, _ = self.clients[0] if identifier == 'Y' else self.clients[1]
+        #     other_message = other_socket.recv(1024).decode('utf-8')
+        #     response += f"{other_identifier}: '{other_message}'"
+        #     logging.info(f'Sending response to both clients: {response}')
 
 
 if __name__ == '__main__':
     server = Server()
     server.start_server()
+    # should return boolean to check if everyone connected
+    server.listen_for_clients(server, 2)
+    server.respond_to_clients()
+
+
+

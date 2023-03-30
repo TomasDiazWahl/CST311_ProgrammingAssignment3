@@ -25,11 +25,11 @@ class Client:
         socket.close()
         self.client_socket = None
 
-    def send_message(self, message) -> int:
+    def send_message(self, message):
         # tests if client_socket connection is open
         if self.client_socket is None:
             logging.info(f'message: {message} not sent. No connection opened')
-            return -1
+            return None
 
         self.client_socket.sendall(message.encode('utf-8'))
         logging.info(f'Sent message: {message}')
@@ -38,7 +38,7 @@ class Client:
         logging.info(f'Received response: {response}')
 
         # return 0 means all good
-        return 0
+        return response
 
 
 if __name__ == '__main__':
@@ -53,6 +53,7 @@ if __name__ == '__main__':
         message = "Howdy!"
 
     client.open_connection()
-    client.send_message(message)
+    response = client.send_message(message)
+    print(response)
     client.close_connection()
 
