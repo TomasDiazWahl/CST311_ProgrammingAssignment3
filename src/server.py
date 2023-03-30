@@ -33,23 +33,23 @@ class Server:
     def listen_for_clients(self, max_clients):
         # gather all the clients before spawing threads
         # let all clients create a connection and join the server
-        client_counter = -1
-        # client_socket.settimeout(30)
-        while len(self.clients) < max_clients:
-            client_socket, client_address = self.server_socket.accept()
-            logging.info(f'Client {client_address} connected')
-            # clients are added to the client list
-            client_counter += 1
-            # dictionary (similar to hashmap) to hold our client information to pass into each thread
-            # the threads will write to the message field using some wizardry
-            client_entry = {"socket": client_socket,
+        self.client_socket.settimeout(10)
+        for i in range(max_clients):
+            try:
+                client_socket, client_address = self.server_socket.accept()
+                logging.info(f'Client {client_address} connected')
+                # dictionary (similar to hashmap) to hold our client information to pass into each thread
+                # the threads will write to the message field using some wizardry
+                client_entry = {"socket": client_socket,
                             "address": client_address,
-                            "client_id": client_counter,
+                            "client_id": i,
                             "msg": None,
                             "msg_time": None}
-            # we append the dictionary to the list
-            # now each entry in the list contains a dictionary with all the client info
-            self.clients.append(client_entry)
+                # we append the dictionary to the list
+                # now each entry in the list contains a dictionary with all the client info
+                self.clients.append(client_entry)
+            except socket.timeout:
+                logging.info(f'Connection timeout. Client {i} failed to connect.')
 
         # spawn threads to handle all clients
         for client_counter, client in enumerate(self.clients):
@@ -95,8 +95,12 @@ class Server:
 if __name__ == '__main__':
     server = Server()
     server.start_server()
+    number_of_clients = 2
     # should return boolean to check if everyone connected
-    server.listen_for_clients(server, 2)
+    server.listen_for_clients(server, number_of_clients)
+    if len(server.clients) != number_of_clients:
+        logging.info(f'One or more clients failed to establish connection')
+        exit(-1)
     server.respond_to_clients()
 
 
