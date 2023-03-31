@@ -7,6 +7,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 def print_dict(d: dict):
+    print(d)
     logging.info('----------- Printing dict {')
     for k, v in d:
         logging.info(f'{k}, {v}')
