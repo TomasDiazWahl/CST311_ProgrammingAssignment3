@@ -11,6 +11,8 @@ PORT_NUMBER = 12000
 class Client:
     # Client instance constructor
     # self is the current instance
+    client_id = -1
+
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -29,6 +31,12 @@ class Client:
         self.client_socket.close()
         self.client_socket = None
 
+    def sync(self):
+        sync_message = "requesting client ID"
+        self.client_socket.sendall(sync_message.encode('utf-8'))
+        server_response = self.client_socket.recv(1024).decode('utf-8')
+        self.client_id = int(server_response)
+
     def send_message(self, message):
         # tests if client_socket connection is open
         if self.client_socket is None:
@@ -46,9 +54,7 @@ class Client:
         return server_response
 
 
-if __name__ == '__main__':
-    # define client by IP address and port number and get user input
-    client = Client('192.168.1.236', PORT_NUMBER)
+def main():
     user_input = input("Enter 1 for 'Hello!' or 2 for 'Howdy!': ")
 
     # check user input
@@ -57,7 +63,12 @@ if __name__ == '__main__':
     else:
         message = "Howdy!"
 
+    # define client by IP address and port number and get user input
+    client = Client('192.168.1.236', PORT_NUMBER)
+
     client.open_connection()
+    client.sync()
+
     # wait a random amount of time between 0 and 3 seconds
     rand_int = randint(0, 3000)
     logging.info(f'Client delay {rand_int} milliseconds')
@@ -66,3 +77,6 @@ if __name__ == '__main__':
     print(server_response)
     client.close_connection()
 
+
+if __name__ == '__main__':
+    main()

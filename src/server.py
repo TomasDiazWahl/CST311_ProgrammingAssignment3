@@ -59,6 +59,12 @@ class Server:
             except socket.timeout:
                 logging.info(f'Connection timeout. Client {i} failed to connect.')
 
+        for client in self.clients:
+            client_socket = client['socket']
+            message = client_socket.recv(1024).decode('utf-8')
+            sync_message = str(client['client_id'])
+            client_socket.sendall(sync_message.encode('utf-8'))
+
         # spawn threads to handle all clients
         for client_counter, client in enumerate(self.clients):
             # creates concurrent threads spawned for each client
