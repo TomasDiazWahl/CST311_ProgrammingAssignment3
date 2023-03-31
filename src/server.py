@@ -85,7 +85,6 @@ class Server:
 
     def handle_client(self, client_id):
         client = self.clients[client_id]
-        print(client.type())
         print(client)
         client_socket = client["socket"]
         client_address = client["address"]
