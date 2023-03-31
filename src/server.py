@@ -33,9 +33,10 @@ class Server:
     def listen_for_clients(self, max_clients):
         # gather all the clients before spawing threads
         # let all clients create a connection and join the server
-        self.server_socket.settimeout(300)
+        # self.server_socket.settimeout(300)
         for i in range(max_clients):
             try:
+                logging.info("Server about to accept client connection...")
                 client_socket, client_address = self.server_socket.accept()
                 logging.info(f'Client {client_address} connected')
                 # dictionary (similar to hashmap) to hold our client information to pass into each thread

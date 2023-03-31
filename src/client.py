@@ -21,7 +21,9 @@ class Client:
     # AF_INET refers to IPV4
     def open_connection(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        logging.info("Attempting to connect...")
         self.client_socket.connect((self.host, self.port))
+        logging.info("Client connected")
 
     def close_connection(self):
         socket.close()
@@ -33,6 +35,7 @@ class Client:
             logging.info(f'message: {message} not sent. No connection opened')
             return None
 
+        logging.info("Client attempting to send message...")
         self.client_socket.sendall(message.encode('utf-8'))
         logging.info(f'Sent message: {message}')
 
