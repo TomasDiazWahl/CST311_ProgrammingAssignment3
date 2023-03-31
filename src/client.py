@@ -59,9 +59,9 @@ if __name__ == '__main__':
 
     client.open_connection()
     # wait a random amount of time between 0 and 3 seconds
-    rand_int = randint(0, 30)
-    logging.info(f'Client delay {rand_int * 10} milliseconds')
-    sleep(rand_int/100)
+    rand_int = randint(0, 3000)
+    logging.info(f'Client delay {rand_int} milliseconds')
+    sleep(rand_int/1000)
     server_response = client.send_message(message)
     print(server_response)
     client.close_connection()

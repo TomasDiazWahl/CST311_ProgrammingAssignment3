@@ -80,9 +80,9 @@ class Server:
         y = self.clients[1]
 
         if x["msg_time"] < y["msg_time"]:
-            response_msg = "X: " + x["msg"] + "Y: " + y["msg"]
+            response_msg = "X: " + x["msg"] + ", Y: " + y["msg"]
         else:
-            response_msg = "Y: " + y["msg"] + "X: " + x["msg"]
+            response_msg = "Y: " + y["msg"] + ", X: " + x["msg"]
 
         return response_msg
 
