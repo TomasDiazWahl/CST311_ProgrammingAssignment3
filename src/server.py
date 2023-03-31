@@ -55,7 +55,7 @@ class Server:
         # spawn threads to handle all clients
         for client_counter, client in enumerate(self.clients):
             # creates concurrent threads spawned for each client
-            client_thread = threading.Thread(target=self.handle_client, args=(client_counter))
+            client_thread = threading.Thread(target=self.handle_client, args=(client_counter,))
             client_thread.start()
             # add the threads to the thread list
             self.threads.append(client_thread)
