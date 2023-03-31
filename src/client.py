@@ -26,7 +26,7 @@ class Client:
         logging.info("Client connected")
 
     def close_connection(self):
-        socket.close()
+        self.client_socket.close()
         self.client_socket = None
 
     def send_message(self, message):
@@ -38,6 +38,7 @@ class Client:
         logging.info("Client attempting to send message...")
         self.client_socket.sendall(message.encode('utf-8'))
         logging.info(f'Sent message: {message}')
+
 
         response = self.client_socket.recv(1024).decode('utf-8')
         logging.info(f'Received response: {response}')

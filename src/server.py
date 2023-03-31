@@ -42,10 +42,10 @@ class Server:
                 # dictionary (similar to hashmap) to hold our client information to pass into each thread
                 # the threads will write to the message field using some wizardry
                 client_entry = {"socket": client_socket,
-                            "address": client_address,
-                            "client_id": i,
-                            "msg": None,
-                            "msg_time": None}
+                                "address": client_address,
+                                "client_id": i,
+                                "msg": None,
+                                "msg_time": None}
                 # we append the dictionary to the list
                 # now each entry in the list contains a dictionary with all the client info
                 self.clients.append(client_entry)
@@ -78,12 +78,15 @@ class Server:
     def respond_to_clients(self):
         response_msg = self.build_response()
         for client in self.clients:
-            socket = client["socket"]
-            socket.sendall(response_msg.encode('utf-8'))
-            socket.close()
+            client_socket = client["socket"]
+            logging.info("Attempting to send response to client...")
+            client_socket.sendall(response_msg.encode('utf-8'))
+            logging.info(f'sent message to {client_socket}: {response_msg.encode("utf-8")}')
 
     def handle_client(self, client_id):
         client = self.clients[client_id]
+        print(client.type())
+        print(client)
         client_socket = client["socket"]
         client_address = client["address"]
 
@@ -91,6 +94,11 @@ class Server:
         logging.info(f'Received message from {client_id}: {message}')
         self.clients[client_id]["msg"] = message
         self.clients[client_id]["msg_time"] = time.time()
+
+    def close_connection(self):
+        logging.info("Closing server socket...")
+        self.server_socket.close()
+        logging.info("Server socket closed")
 
 
 if __name__ == '__main__':
@@ -103,6 +111,7 @@ if __name__ == '__main__':
         logging.info(f'One or more clients failed to establish connection')
         exit(-1)
     server.respond_to_clients()
+    server.close_connection()
 
 
 
