@@ -52,7 +52,7 @@ if __name__ == '__main__':
     user_input = input("Enter 1 for 'Hello!' or 2 for 'Howdy!': ")
 
     # check user input
-    if user_input is 1:
+    if user_input == 1:
         message = "Hello!"
     else:
         message = "Howdy!"
