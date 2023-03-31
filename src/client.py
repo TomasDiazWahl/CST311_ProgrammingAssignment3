@@ -48,7 +48,7 @@ class Client:
 
 if __name__ == '__main__':
     # define client by IP address and port number and get user input
-    client = Client('198.162.1.236', PORT_NUMBER)
+    client = Client(socket.gethostname(), PORT_NUMBER)
     user_input = input("Enter 1 for 'Hello!' or 2 for 'Howdy!': ")
 
     # check user input
