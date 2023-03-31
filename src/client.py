@@ -39,12 +39,11 @@ class Client:
         self.client_socket.sendall(message.encode('utf-8'))
         logging.info(f'Sent message: {message}')
 
-
-        response = self.client_socket.recv(1024).decode('utf-8')
-        logging.info(f'Received response: {response}')
+        server_response = self.client_socket.recv(1024).decode('utf-8')
+        logging.info(f'Received response: {server_response}')
 
         # return 0 means all good
-        return response
+        return server_response
 
 
 if __name__ == '__main__':
@@ -53,15 +52,17 @@ if __name__ == '__main__':
     user_input = input("Enter 1 for 'Hello!' or 2 for 'Howdy!': ")
 
     # check user input
-    if user_input == 1:
+    if user_input == '1':
         message = "Hello!"
     else:
         message = "Howdy!"
 
     client.open_connection()
     # wait a random amount of time between 0 and 3 seconds
-    sleep(randint(0, 3))
-    response = client.send_message(message)
-    print(response)
+    rand_int = randint(0, 30)
+    logging.info(f'Client delay {rand_int * 10} milliseconds')
+    sleep(rand_int/100)
+    server_response = client.send_message(message)
+    print(server_response)
     client.close_connection()
 

@@ -7,7 +7,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 def print_dict(d: dict):
-    print(d)
     logging.info('----------- Printing dict {')
     for item in d.items():
         logging.info(item)
@@ -60,10 +59,6 @@ class Server:
             except socket.timeout:
                 logging.info(f'Connection timeout. Client {i} failed to connect.')
 
-        for i, d in enumerate(self.clients):
-            print_dict(d)
-        # END list_for_clients
-
         # spawn threads to handle all clients
         for client_counter, client in enumerate(self.clients):
             # creates concurrent threads spawned for each client
@@ -75,6 +70,10 @@ class Server:
         # wait for all clients to finish
         for thread in self.threads:
             thread.join()
+
+        for i, d in enumerate(self.clients):
+            print_dict(d)
+    # END listen_for_clients
 
     def build_response(self):
         x = self.clients[0]
