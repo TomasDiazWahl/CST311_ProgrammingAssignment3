@@ -6,6 +6,13 @@ import time
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+def print_dict(d: dict):
+    logging.info('----------- Printing dict {')
+    for k, v in d:
+        logging.info(f'{k}, {v}')
+    logging.info('} # End printing dict ----------')
+
+
 class Server:
     # Server constructor
     def __init__(self, host, port):
@@ -52,6 +59,10 @@ class Server:
             except socket.timeout:
                 logging.info(f'Connection timeout. Client {i} failed to connect.')
 
+        for i, d in enumerate(self.clients):
+            print_dict(d)
+        # END list_for_clients
+
         # spawn threads to handle all clients
         for client_counter, client in enumerate(self.clients):
             # creates concurrent threads spawned for each client
@@ -84,14 +95,15 @@ class Server:
             logging.info(f'sent message to {client_socket}: {response_msg.encode("utf-8")}')
 
     def handle_client(self, client_id):
-        client = self.clients[client_id]
-        print(client)
+        client = dict(self.clients[client_id])
+        print_dict(client)
         client_socket = client["socket"]
         client_address = client["address"]
 
         message = client_socket.recv(1024).decode('utf-8')
         logging.info(f'Received message from {client_id}: {message}')
         self.clients[client_id]["msg"] = message
+        logging.info(f'The following message added to client {client_id}: {message}')
         self.clients[client_id]["msg_time"] = time.time()
 
     def close_connection(self):

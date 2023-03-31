@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="66d529f4-8758-4c6f-85a0-a4dbc89b55c9" name="Changes" comment="commit server thread args">
+    <list default="true" id="66d529f4-8758-4c6f-85a0-a4dbc89b55c9" name="Changes" comment="commit server changes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/server.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -195,7 +194,21 @@
       <option name="project" value="LOCAL" />
       <updated>1680290574403</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="commit server changes">
+      <created>1680291965917</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1680291965917</updated>
+    </task>
+    <task id="LOCAL-00019" summary="commit server changes">
+      <created>1680292210204</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1680292210204</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -216,6 +229,7 @@
     <MESSAGE value="commit server ip" />
     <MESSAGE value="commit server ip1" />
     <MESSAGE value="commit server thread args" />
-    <option name="LAST_COMMIT_MESSAGE" value="commit server thread args" />
+    <MESSAGE value="commit server changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="commit server changes" />
   </component>
 </project>
