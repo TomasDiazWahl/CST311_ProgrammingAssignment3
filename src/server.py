@@ -1,3 +1,10 @@
+# Authors: Tomas Diaz-Wahl, Tamanna Zahir, Liam Cristescu, Guy Allgood
+# Date: 2023-04-02
+# Description: Server accepts connection from N clients, but the logic is only for two client, as per the assignment
+# The order of clients is recorded in a list. Once all clients connect, threads are spawned to handle the client
+# messages. Threads are needed to handle simultaneous messages. The message times are recorded using time.time
+# and the server returns the order in which the clients connected as well as the messages that each client sent.
+
 import socket
 import threading
 import logging

@@ -1,3 +1,8 @@
+# Authors: Tomas Diaz-Wahl, Tamanna Zahir, Liam Cristescu, Guy Allgood
+# Date: 2023-04-02
+# Description: Each client connects to or server and waits for all clients to connect. The client then sends a
+# message (hello or howdy) and then waits for the server to respond. The client then prints the server response.
+
 import socket
 import logging
 from time import sleep
