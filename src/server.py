@@ -10,14 +10,17 @@ import threading
 import logging
 import time
 
+DEBUG = False
+# configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def print_dict(d: dict):
-    logging.info('----------- Printing dict {')
-    for item in d.items():
-        logging.info(item)
-    logging.info('} # End printing dict ----------')
+    if DEBUG:
+        logging.info('----------- Printing dict {')
+        for item in d.items():
+            logging.info(item)
+        logging.info('} # End printing dict ----------')
 
 
 class Server:
@@ -103,7 +106,7 @@ class Server:
         response_msg = self.build_response()
         for client in self.clients:
             client_socket = client["socket"]
-            logging.info("Attempting to send response to client...")
+            logging.info("Attempting to send respond to client...")
             client_socket.sendall(response_msg.encode('utf-8'))
             logging.info(f'sent message to {client_socket}: {response_msg.encode("utf-8")}')
 
