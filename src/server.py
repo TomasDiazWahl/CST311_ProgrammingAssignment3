@@ -35,6 +35,8 @@ class Server:
         self.threads = []
         self.SOCKET_INDEX = 0
         self.ADDRESS_INDEX = 1
+        # global semaphore allowing access to protected list of clients
+        self.semaphore = threading.Semaphore(1)
 
     # this method starts the server and opens a TCP connection
     def start_server(self):
@@ -48,6 +50,29 @@ class Server:
 
     # this method spawns a thread to listen to up to n number of clients
     def listen_for_clients(self, max_clients):
+        # accept client connection and create client list in order of connection
+        self.accept_client_connections(max_clients)
+
+        self.sync_clients()
+
+        # spawn threads to handle all clients
+        for client_counter in range(max_clients):
+            # creates concurrent threads spawned for each client
+            client_thread = threading.Thread(target=self.handle_client, args=(client_counter,))
+            client_thread.start()
+            # add the threads to the thread list
+            self.threads.append(client_thread)
+
+        # wait for all clients to finish
+        for thread in self.threads:
+            thread.join()
+
+        with self.semaphore:
+            for i, d in enumerate(self.clients):
+                print_dict(d)
+    # END listen_for_clients
+
+    def accept_client_connections(self, max_clients):
         # gather all the clients before spawing threads
         # let all clients create a connection and join the server
         # self.server_socket.settimeout(300)
@@ -63,37 +88,26 @@ class Server:
                                 "client_id": i,
                                 "msg": None,
                                 "msg_time": None}
-                # we append the dictionary to the list
-                # now each entry in the list contains a dictionary with all the client info
-                self.clients.append(client_entry)
+                with self.semaphore:
+                    # we append the dictionary to the list
+                    # now each entry in the list contains a dictionary with all the client info
+                    self.clients.append(client_entry)
             except socket.timeout:
                 logging.info(f'Connection timeout. Client {i} failed to connect.')
 
-        for client in self.clients:
-            client_socket = client['socket']
-            message = client_socket.recv(1024).decode('utf-8')
-            sync_message = str(client['client_id'])
-            client_socket.sendall(sync_message.encode('utf-8'))
-
-        # spawn threads to handle all clients
-        for client_counter, client in enumerate(self.clients):
-            # creates concurrent threads spawned for each client
-            client_thread = threading.Thread(target=self.handle_client, args=(client_counter,))
-            client_thread.start()
-            # add the threads to the thread list
-            self.threads.append(client_thread)
-
-        # wait for all clients to finish
-        for thread in self.threads:
-            thread.join()
-
-        for i, d in enumerate(self.clients):
-            print_dict(d)
-    # END listen_for_clients
+    def sync_clients(self):
+        with self.semaphore:
+            for client in self.clients:
+                client_socket = client['socket']
+                # this message is only for synchronization and ignored
+                message = client_socket.recv(1024).decode('utf-8')
+                sync_message = str(client['client_id'])
+                client_socket.sendall(sync_message.encode('utf-8'))
 
     def build_response(self):
-        x = self.clients[0]
-        y = self.clients[1]
+        with self.semaphore:
+            x = self.clients[0]
+            y = self.clients[1]
 
         if x["msg_time"] < y["msg_time"]:
             response_msg = "X: " + x["msg"] + ", Y: " + y["msg"]
@@ -104,23 +118,26 @@ class Server:
 
     def respond_to_clients(self):
         response_msg = self.build_response()
-        for client in self.clients:
-            client_socket = client["socket"]
-            logging.info("Attempting to send respond to client...")
-            client_socket.sendall(response_msg.encode('utf-8'))
-            logging.info(f'sent message to {client_socket}: {response_msg.encode("utf-8")}')
+        with self.semaphore:
+            for client in self.clients:
+                client_socket = client["socket"]
+                logging.info("Attempting to send response to client...")
+                client_socket.sendall(response_msg.encode('utf-8'))
+                logging.info(f'sent message to {client_socket}: {response_msg.encode("utf-8")}')
 
     def handle_client(self, client_id):
-        client = dict(self.clients[client_id])
+        with self.semaphore:
+            client = dict(self.clients[client_id])
         print_dict(client)
         client_socket = client["socket"]
         client_address = client["address"]
 
         message = client_socket.recv(1024).decode('utf-8')
         logging.info(f'Received message from {client_id}: {message}')
-        self.clients[client_id]["msg"] = message
-        logging.info(f'The following message added to client {client_id}: {message}')
-        self.clients[client_id]["msg_time"] = time.time()
+        with self.semaphore:
+            self.clients[client_id]["msg"] = message
+            self.clients[client_id]["msg_time"] = time.time()
+        logging.info(f'This message added to client {client_id}: {message}')
 
     def close_connection(self):
         logging.info("Closing server socket...")
