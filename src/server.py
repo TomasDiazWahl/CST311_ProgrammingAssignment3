@@ -9,8 +9,7 @@ import socket
 import threading
 import logging
 import time
-
-#55555
+import queue
 
 DEBUG = False
 # configure logging
@@ -39,6 +38,7 @@ class Server:
         self.ADDRESS_INDEX = 1
         # global semaphore allowing access to protected list of clients
         self.semaphore = threading.Semaphore(1)
+        self.msg_queue = queue.Queue(100)
 
     # this method starts the server and opens a TCP connection
     def start_server(self):
@@ -60,7 +60,7 @@ class Server:
         # spawn threads to handle all clients
         for client_counter in range(max_clients):
             # creates concurrent threads spawned for each client
-            client_thread = threading.Thread(target=self.handle_client, args=(client_counter,))
+            client_thread = threading.Thread(target=self.handle_client, args=(self.clients[client_counter],))
             client_thread.start()
             # add the threads to the thread list
             self.threads.append(client_thread)
@@ -127,19 +127,53 @@ class Server:
                 client_socket.sendall(response_msg.encode('utf-8'))
                 logging.info(f'sent message to {client_socket}: {response_msg.encode("utf-8")}')
 
-    def handle_client(self, client_id):
-        with self.semaphore:
-            client = dict(self.clients[client_id])
+    def handle_client(self, client: dict):
         print_dict(client)
+        client_id = client["client_id"]
         client_socket = client["socket"]
         client_address = client["address"]
+        response_dict = {"cmd": 1,
+                         "msg": "",
+                         "time": 0.0,
+                         "client_id": client_id}
 
         message = client_socket.recv(1024).decode('utf-8')
         logging.info(f'Received message from {client_id}: {message}')
-        with self.semaphore:
-            self.clients[client_id]["msg"] = message
-            self.clients[client_id]["msg_time"] = time.time()
-        logging.info(f'This message added to client {client_id}: {message}')
+        response_dict["msg"] = message
+        if message.lower() == "bye":
+            response_dict["cmd"] = 0
+            return
+        response_dict["time"] = time.time()
+        self.msg_queue.put(response_dict)
+        # logging.info(f'This message added to client {client_id}: {message}')
+
+    def handle_responses(self):
+        # print_dict(client)
+        # client_id = client["client_id"]
+        # client_socket = client["socket"]
+        # client_address = client["address"]
+        response_dict = {"cmd": 1,
+                         "msg": "",
+                         "time": 0.0,
+                         "client_id": -1}
+        chat_active = True
+        while chat_active:
+            message = self.msg_queue.get()
+            cmd = message["cmd"]
+            if cmd == 0:
+                response_dict["cmd"] = 0
+            response_dict = message.copy()
+            # logging.info(f'Received message from {client_id}: {message}')
+            msg_client_id = message["client_id"]
+            for client in self.clients:
+                client_id = client["client_id"]
+                client_socket = client["socket"]
+                response_msg = message["msg"]
+
+                if msg_client_id != client_id:
+                    client_socket.sendall(response_msg.encode('utf-8'))
+        # logging.info(f'This message added to client {client_id}: {message}')
+
 
     def close_connection(self):
         logging.info("Closing server socket...")
